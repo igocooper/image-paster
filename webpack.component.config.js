@@ -7,11 +7,11 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: ['./index.js'],
   plugins: [
-    new CleanWebpackPlugin([path.resolve(__dirname, 'build')]),
+    new CleanWebpackPlugin([path.resolve(__dirname, 'dist')]),
   ],
   devtool: 'source-map',
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
   },
   module: {
