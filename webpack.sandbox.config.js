@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const host = 'dev.web-components';
-const port = 8080;
+const port = 8090;
 
 module.exports = {
   devServer: {

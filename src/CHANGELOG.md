@@ -2,4 +2,4 @@
 
 ## 1.0.0
 
-* add `i-tooltip` component
+* add `image-paster` component

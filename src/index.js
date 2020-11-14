@@ -1,1 +1,1 @@
-import './tooltip';
+import './image-paster';
