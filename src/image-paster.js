@@ -13,11 +13,6 @@ class ImagePaster extends HTMLElement {
     this.context = this.canvas.getContext("2d");
     this.preview = this.shadow.querySelector("#next-photo-preview");
 
-    // defer updating images so it's loaded fully into light dom
-    setTimeout(() => {
-      this.updateImages();
-      this.updatePreview();
-    }, 4);
     this.setCanvasSize();
     this.bindMethods();
   }
@@ -25,6 +20,12 @@ class ImagePaster extends HTMLElement {
   connectedCallback() {
     this.canvas.addEventListener("mousedown", this.handleMouseClick);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
+
+    // defer updating images so it's loaded fully into light dom
+    setTimeout(() => {
+      this.updateImages();
+      this.updatePreview();
+    }, 4);
   }
 
   disconnectedCallback() {
