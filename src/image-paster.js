@@ -21,11 +21,7 @@ class ImagePaster extends HTMLElement {
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
 
     this.setCanvasSize();
-    // defer updating images so it's loaded fully into light dom
-    setTimeout(() => {
-      this.updateImages();
-      this.updatePreview();
-    }, 4);
+    this.initializeImages();
   }
 
   disconnectedCallback() {
@@ -38,6 +34,7 @@ class ImagePaster extends HTMLElement {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updateImages = this.updateImages.bind(this);
+    this.initializeImages = this.initializeImages.bind(this);
   }
 
   setCanvasSize() {
@@ -82,6 +79,22 @@ class ImagePaster extends HTMLElement {
 
     this.addImage(this.getImage(), x, y);
     this.updatePreview();
+  }
+
+  initializeImages() {
+    // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
+    const self = this;
+    const timer = setTimeout(() => {
+      self.updateImages();
+
+      const firstImage = self.images[0];
+      if (firstImage.width > 0) {
+        clearTimeout(timer);
+        self.updatePreview();
+        return;
+      }
+      self.initializeImages();
+    }, 100);
   }
 
   updateImages() {
