@@ -27,10 +27,6 @@ template.innerHTML = `
       max-width: 150px;
       opacity: 0;
     }
-
-    #canvas {
-      background-color: black;
-    }
   </style>
   <img id="next-photo-preview" />
   <canvas id="canvas"></canvas>

@@ -164,6 +164,7 @@ class ImagePaster extends HTMLElement {
     this.canvas = this.shadow.querySelector("#canvas");
     this.context = this.canvas.getContext("2d");
     this.preview = this.shadow.querySelector("#next-photo-preview");
+    this.gallery = this.previousElementSibling;
 
     this.bindMethods();
   }
@@ -172,6 +173,7 @@ class ImagePaster extends HTMLElement {
     this.canvas.addEventListener("mousedown", this.handleMouseClick);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
 
+    this.hideGallery();
     this.setCanvasSize();
     this.initializeImages();
   }
@@ -187,6 +189,7 @@ class ImagePaster extends HTMLElement {
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updateImages = this.updateImages.bind(this);
     this.initializeImages = this.initializeImages.bind(this);
+    this.hideGallery = this.hideGallery.bind(this);
   }
 
   setCanvasSize() {
@@ -258,9 +261,13 @@ class ImagePaster extends HTMLElement {
     }, 100);
   }
 
+  hideGallery() {
+    this.gallery.setAttribute('style', 'opacity: 0; position: absolute; pointer-events: none;');
+  }
+
   updateImages() {
-    this.images = [...this.previousElementSibling.querySelectorAll("img")].map(image => {
-      const src = image.getAttribute("src");
+    this.images = [...this.gallery.querySelectorAll("img")].map(image => {
+      const src = image.getAttribute("data-src");
 
       var _image$getBoundingCli = image.getBoundingClientRect();
 
@@ -343,10 +350,6 @@ template.innerHTML = `
       pointer-events: none;
       max-width: 150px;
       opacity: 0;
-    }
-
-    #canvas {
-      background-color: black;
     }
   </style>
   <img id="next-photo-preview" />
