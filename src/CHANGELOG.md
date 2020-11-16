@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.2
+
+* fix bug with preloading images
+
 ## 1.0.1
 
 * fix bug with non-loaded images due to lazy load

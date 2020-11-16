@@ -1,5 +1,6 @@
 import constants from "./constants";
 import getClickWithinElement from "./helpers/get-click-within-element";
+import getImageSize from "./helpers/get-image-size";
 import template from "./template";
 
 class ImagePaster extends HTMLElement {
@@ -21,7 +22,6 @@ class ImagePaster extends HTMLElement {
     this.canvas.addEventListener("mousedown", this.handleMouseClick);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
 
-    this.hideGallery();
     this.setCanvasSize();
     this.initializeImages();
   }
@@ -37,7 +37,6 @@ class ImagePaster extends HTMLElement {
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updateImages = this.updateImages.bind(this);
     this.initializeImages = this.initializeImages.bind(this);
-    this.hideGallery = this.hideGallery.bind(this);
   }
 
   setCanvasSize() {
@@ -100,14 +99,11 @@ class ImagePaster extends HTMLElement {
     }, 100);
   }
 
-  hideGallery() {
-    this.gallery.setAttribute('style', 'opacity: 0; position: absolute; pointer-events: none;');
-  }
-
   updateImages() {
     this.images = [...this.gallery.querySelectorAll("img")].map(
       (image) => {
         const src = image.getAttribute("data-src");
+        getImageSize(src);
         const { width, height } = image.getBoundingClientRect();
         return { width, height, src, element: image };
       }
