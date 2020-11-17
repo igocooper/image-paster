@@ -128,14 +128,12 @@ class ImagePaster extends HTMLElement {
       images.map(async (image) => {
         const imgSrc = prepareCargoMediaSource({
           src: image.src,
-          imgWidth: image.width,
         });
 
-        // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
-        image.element.setAttribute('src', imgSrc);
         return {
           ...image,
           src: imgSrc,
+          'data-src': image.src,
         };
       })
     );
@@ -143,6 +141,7 @@ class ImagePaster extends HTMLElement {
 
   reInitImages() {
     this.images = [...this.initialImages];
+
   }
 
   updatePreview() {

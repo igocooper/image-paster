@@ -384,14 +384,12 @@ class ImagePaster extends HTMLElement {
       return Promise.all(images.map((() => {
         var _ref = _asyncToGenerator(function* (image) {
           const imgSrc = (0, _prepareCargoMediaSource2.default)({
-            src: image.src,
-            imgWidth: image.width
+            src: image.src
           });
 
-          // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
-          image.element.setAttribute('src', imgSrc);
           return _extends({}, image, {
-            src: imgSrc
+            src: imgSrc,
+            'data-src': image.src
           });
         });
 
