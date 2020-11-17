@@ -253,7 +253,8 @@ class ImagePaster extends HTMLElement {
       throw new Error('You should use image-paster only right after gallery block for proper initialization');
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')].forEach(image => {
+    this.images = [...this.gallery.querySelectorAll('img')];
+    this.images.forEach(image => {
       image.setAttribute('src', image.getAttribute('data-src'));
     });
   }
