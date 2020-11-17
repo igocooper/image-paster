@@ -4,7 +4,7 @@ const prepareCargoMediaSource = ({ src, imgWidth, originalImgWidth }) => {
       ? imgWidth * 2
       : originalImgWidth;
 
-  return src.replace('/t/original/', `/w/${width}/q/75/`);
+  return src.replace('/t/original/', `/w/${width.toFixed()}/q/75/`);
 };
 
 export default prepareCargoMediaSource;

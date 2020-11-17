@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.1
+
+* fix helper to prepare argo media assets to use only fixed `width` values
+
 ## 1.1.0
 
 * initialization refactoring
