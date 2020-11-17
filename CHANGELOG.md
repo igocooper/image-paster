@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.4
+
+* fix bug with drawing incorrect image sizes into canvas
+
 ## 1.1.3
 
 * fix bug with redundant image src from original image element

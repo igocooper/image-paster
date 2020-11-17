@@ -389,7 +389,11 @@ class ImagePaster extends HTMLElement {
             imgWidth: image.width,
             originalImgWidth
           });
+
+          // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
           const element = yield (0, _preloadImage2.default)(imgSrc);
+          element.setAttribute('width', image.width);
+          element.setAttribute('height', image.height);
 
           return _extends({}, image, {
             src: imgSrc,
