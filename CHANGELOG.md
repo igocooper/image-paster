@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.2
+
+* fix bug with image re-initialization it's no more using references to arrays
+
 ## 1.1.1
 
 * fix helper to prepare argo media assets to use only fixed `width` values

@@ -93,9 +93,9 @@ class ImagePaster extends HTMLElement {
 
     if (isImagesSizesReady) {
       // preload images and and store initial images for further usage
-      const images = await this.initImages(this.images);
-      this.initialImages = images;
+      this.initialImages = await this.initImages(this.images);
 
+      this.reInitImages();
       this.updatePreview();
       // add event listeners to canvas
       this.canvas.addEventListener('mousedown', this.handleMouseClick);
@@ -143,7 +143,7 @@ class ImagePaster extends HTMLElement {
   }
 
   reInitImages() {
-    this.images = this.initialImages;
+    this.images = [...this.initialImages];
   }
 
   updatePreview() {
