@@ -97,7 +97,8 @@ class ImagePaster extends HTMLElement {
       );
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')].forEach((image) => {
+    this.images = [...this.gallery.querySelectorAll('img')];
+    this.images.forEach((image) => {
       image.setAttribute('src', image.getAttribute('data-src'));
     });
   }
