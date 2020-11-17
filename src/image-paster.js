@@ -1,43 +1,44 @@
-import constants from "./constants";
-import getClickWithinElement from "./helpers/get-click-within-element";
-import getImageSize from "./helpers/get-image-size";
-import prepareCargoMediaSource from "./helpers/prepare-cargo-media-source";
-import template from "./template";
+import constants from './constants';
+import getClickWithinElement from './helpers/get-click-within-element';
+import getImageSize from './helpers/get-image-size';
+import wait from './helpers/wait';
+import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
+import template from './template';
 
 class ImagePaster extends HTMLElement {
   constructor() {
     super();
 
-    this.shadow = this.attachShadow({ mode: "open" }); // sets and returns 'this.shadowRoot'
+    this.shadow = this.attachShadow({ mode: 'open' }); // sets and returns 'this.shadowRoot'
     // attach the created elements to the shadow DOM
     this.shadow.append(document.importNode(template.content, true));
-    this.canvas = this.shadow.querySelector("#canvas");
-    this.context = this.canvas.getContext("2d");
-    this.preview = this.shadow.querySelector("#next-photo-preview");
+    this.canvas = this.shadow.querySelector('#canvas');
+    this.context = this.canvas.getContext('2d');
+    this.preview = this.shadow.querySelector('#next-photo-preview');
     this.gallery = this.previousElementSibling;
 
     this.bindMethods();
   }
 
   connectedCallback() {
-    this.canvas.addEventListener("mousedown", this.handleMouseClick);
-    this.canvas.addEventListener("mousemove", this.handleMouseMove);
-
     this.setCanvasSize();
-    this.initializeImages();
+    this.init();
   }
 
   disconnectedCallback() {
-    this.canvas.removeEventListener("mousedown", this.handleMouseClick);
-    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+    this.canvas.removeEventListener('mousedown', this.handleMouseClick);
+    this.canvas.removeEventListener('mousemove', this.handleMouseMove);
   }
 
   bindMethods() {
     this.handleMouseClick = this.handleMouseClick.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.setCanvasSize = this.setCanvasSize.bind(this);
+    this.updatePreview = this.updatePreview.bind(this);
     this.updateImages = this.updateImages.bind(this);
-    this.initializeImages = this.initializeImages.bind(this);
+    this.initImages = this.initImages.bind(this);
+    this.reInitImages = this.reInitImages.bind(this);
+    this.init = this.init.bind(this);
   }
 
   setCanvasSize() {
@@ -51,7 +52,7 @@ class ImagePaster extends HTMLElement {
   }
 
   addRedRectagle(x, y, w = 10, h = 10) {
-    this.context.fillStyle = "red";
+    this.context.fillStyle = 'red';
     this.context.fillRect(x, y, w, h);
   }
 
@@ -70,7 +71,7 @@ class ImagePaster extends HTMLElement {
     const x = posX + offset;
     const y = posY + offset;
     this.preview.setAttribute(
-      "style",
+      'style',
       `transform: translate3d(${x}px, ${y}px, 0px); webkit-transform: translate3d(${x}px, ${y}px, 0px); moz-transform: translate3d(${x}px, ${y}px, 0px);`
     );
   }
@@ -82,39 +83,75 @@ class ImagePaster extends HTMLElement {
     this.updatePreview();
   }
 
-  initializeImages() {
-    // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
-    const self = this;
-    const timer = setTimeout(() => {
-      self.updateImages();
+  async init() {
+    // timeout to not abuse call stack limit
+    await wait(100);
 
-      const firstImage = self.images[0];
-      if (firstImage.width > 0) {
-        clearTimeout(timer);
-        self.updatePreview();
-        return;
-      }
-      self.initializeImages();
-    }, 100);
+    this.updateImages();
+    const firstImage = this.images[0];
+    const isImagesSizesReady = firstImage.width > 0;
+
+    if (isImagesSizesReady) {
+      // preload images and and store initial images for further usage
+      const images = await this.initImages(this.images);
+      this.initialImages = images;
+
+      this.updatePreview();
+      // add event listeners to canvas
+      this.canvas.addEventListener('mousedown', this.handleMouseClick);
+      this.canvas.addEventListener('mousemove', this.handleMouseMove);
+      return;
+    }
+    // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
+    this.init();
   }
 
   updateImages() {
-    this.images = [...this.gallery.querySelectorAll("img")].map(
-      (image) => {
-        const src = prepareCargoMediaSource(image.getAttribute("data-src"));
-        getImageSize(src);
-        const { width, height } = image.getBoundingClientRect();
-        return { width, height, src, element: image };
-      }
+    if (!this.gallery || !this.gallery.querySelectorAll) {
+      throw new Error(
+        'You should use image-paster only right after gallery block for proper initialization'
+      );
+    }
+
+    this.images = [...this.gallery.querySelectorAll('img')].map((image) => {
+      const src = image.getAttribute('data-src');
+      const { width, height } = image.getBoundingClientRect();
+      return { width, height, src, element: image };
+    });
+  }
+
+  async initImages(images) {
+    if (!images) {
+      throw new Error('Oops! Something went wrong, images were NOT collected 💩');
+    }
+    return Promise.all(
+      images.map(async (image) => {
+        const originalImgWidth = image.element.getAttribute('width');
+        const imgSrc = prepareCargoMediaSource({
+          src: image.src,
+          imgWidth: image.width,
+          originalImgWidth,
+        });
+        await getImageSize(imgSrc);
+
+        return {
+          ...image,
+          src: imgSrc,
+        };
+      })
     );
+  }
+
+  reInitImages() {
+    this.images = this.initialImages;
   }
 
   updatePreview() {
     if (!this.images.length) {
-      this.updateImages();
+      this.reInitImages();
     }
     const nextImage = this.images[0];
-    this.preview.setAttribute("src", nextImage.src);
+    this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {

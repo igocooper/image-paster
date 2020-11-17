@@ -176,9 +176,36 @@ exports.default = getImageSize;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const prepareCargoMediaSource = (src, imgWidth) => src.replace('/t/original/', `/w/${imgWidth}/q/75/`);
+const prepareCargoMediaSource = ({ src, imgWidth, originalImgWidth }) => {
+  const width = imgWidth !== originalImgWidth && imgWidth * 2 < originalImgWidth ? imgWidth * 2 : originalImgWidth;
+
+  return src.replace('/t/original/', `/w/${width}/q/75/`);
+};
 
 exports.default = prepareCargoMediaSource;
+
+/***/ }),
+
+/***/ "./helpers/wait.js":
+/*!*************************!*\
+  !*** ./helpers/wait.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const wait = timer => new Promise(res => {
+  setTimeout(() => {
+    res();
+  }, timer);
+});
+
+exports.default = wait;
 
 /***/ }),
 
@@ -192,6 +219,8 @@ exports.default = prepareCargoMediaSource;
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _constants = __webpack_require__(/*! ./constants */ "./constants/index.js");
 
 var _constants2 = _interopRequireDefault(_constants);
@@ -204,6 +233,10 @@ var _getImageSize = __webpack_require__(/*! ./helpers/get-image-size */ "./helpe
 
 var _getImageSize2 = _interopRequireDefault(_getImageSize);
 
+var _wait = __webpack_require__(/*! ./helpers/wait */ "./helpers/wait.js");
+
+var _wait2 = _interopRequireDefault(_wait);
+
 var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-media-source */ "./helpers/prepare-cargo-media-source.js");
 
 var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
@@ -214,40 +247,42 @@ var _template2 = _interopRequireDefault(_template);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 class ImagePaster extends HTMLElement {
   constructor() {
     super();
 
-    this.shadow = this.attachShadow({ mode: "open" }); // sets and returns 'this.shadowRoot'
+    this.shadow = this.attachShadow({ mode: 'open' }); // sets and returns 'this.shadowRoot'
     // attach the created elements to the shadow DOM
     this.shadow.append(document.importNode(_template2.default.content, true));
-    this.canvas = this.shadow.querySelector("#canvas");
-    this.context = this.canvas.getContext("2d");
-    this.preview = this.shadow.querySelector("#next-photo-preview");
+    this.canvas = this.shadow.querySelector('#canvas');
+    this.context = this.canvas.getContext('2d');
+    this.preview = this.shadow.querySelector('#next-photo-preview');
     this.gallery = this.previousElementSibling;
 
     this.bindMethods();
   }
 
   connectedCallback() {
-    this.canvas.addEventListener("mousedown", this.handleMouseClick);
-    this.canvas.addEventListener("mousemove", this.handleMouseMove);
-
     this.setCanvasSize();
-    this.initializeImages();
+    this.init();
   }
 
   disconnectedCallback() {
-    this.canvas.removeEventListener("mousedown", this.handleMouseClick);
-    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+    this.canvas.removeEventListener('mousedown', this.handleMouseClick);
+    this.canvas.removeEventListener('mousemove', this.handleMouseMove);
   }
 
   bindMethods() {
     this.handleMouseClick = this.handleMouseClick.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.setCanvasSize = this.setCanvasSize.bind(this);
+    this.updatePreview = this.updatePreview.bind(this);
     this.updateImages = this.updateImages.bind(this);
-    this.initializeImages = this.initializeImages.bind(this);
+    this.initImages = this.initImages.bind(this);
+    this.reInitImages = this.reInitImages.bind(this);
+    this.init = this.init.bind(this);
   }
 
   setCanvasSize() {
@@ -265,7 +300,7 @@ class ImagePaster extends HTMLElement {
   }
 
   addRedRectagle(x, y, w = 10, h = 10) {
-    this.context.fillStyle = "red";
+    this.context.fillStyle = 'red';
     this.context.fillRect(x, y, w, h);
   }
 
@@ -287,7 +322,7 @@ class ImagePaster extends HTMLElement {
     const offset = 10;
     const x = posX + offset;
     const y = posY + offset;
-    this.preview.setAttribute("style", `transform: translate3d(${x}px, ${y}px, 0px); webkit-transform: translate3d(${x}px, ${y}px, 0px); moz-transform: translate3d(${x}px, ${y}px, 0px);`);
+    this.preview.setAttribute('style', `transform: translate3d(${x}px, ${y}px, 0px); webkit-transform: translate3d(${x}px, ${y}px, 0px); moz-transform: translate3d(${x}px, ${y}px, 0px);`);
   }
 
   handleMouseClick(event) {
@@ -301,26 +336,40 @@ class ImagePaster extends HTMLElement {
     this.updatePreview();
   }
 
-  initializeImages() {
-    // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
-    const self = this;
-    const timer = setTimeout(() => {
-      self.updateImages();
+  init() {
+    var _this = this;
 
-      const firstImage = self.images[0];
-      if (firstImage.width > 0) {
-        clearTimeout(timer);
-        self.updatePreview();
+    return _asyncToGenerator(function* () {
+      // timeout to not abuse call stack limit
+      yield (0, _wait2.default)(100);
+
+      _this.updateImages();
+      const firstImage = _this.images[0];
+      const isImagesSizesReady = firstImage.width > 0;
+
+      if (isImagesSizesReady) {
+        // preload images and and store initial images for further usage
+        const images = yield _this.initImages(_this.images);
+        _this.initialImages = images;
+
+        _this.updatePreview();
+        // add event listeners to canvas
+        _this.canvas.addEventListener('mousedown', _this.handleMouseClick);
+        _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
         return;
       }
-      self.initializeImages();
-    }, 100);
+      // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
+      _this.init();
+    })();
   }
 
   updateImages() {
-    this.images = [...this.gallery.querySelectorAll("img")].map(image => {
-      const src = (0, _prepareCargoMediaSource2.default)(image.getAttribute("data-src"));
-      (0, _getImageSize2.default)(src);
+    if (!this.gallery || !this.gallery.querySelectorAll) {
+      throw new Error('You should use image-paster only right after gallery block for proper initialization');
+    }
+
+    this.images = [...this.gallery.querySelectorAll('img')].map(image => {
+      const src = image.getAttribute('data-src');
 
       var _image$getBoundingCli = image.getBoundingClientRect();
 
@@ -331,12 +380,43 @@ class ImagePaster extends HTMLElement {
     });
   }
 
+  initImages(images) {
+    return _asyncToGenerator(function* () {
+      if (!images) {
+        throw new Error('Oops! Something went wrong, images were NOT collected 💩');
+      }
+      return Promise.all(images.map((() => {
+        var _ref = _asyncToGenerator(function* (image) {
+          const originalImgWidth = image.element.getAttribute('width');
+          const imgSrc = (0, _prepareCargoMediaSource2.default)({
+            src: image.src,
+            imgWidth: image.width,
+            originalImgWidth
+          });
+          yield (0, _getImageSize2.default)(imgSrc);
+
+          return _extends({}, image, {
+            src: imgSrc
+          });
+        });
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      })()));
+    })();
+  }
+
+  reInitImages() {
+    this.images = this.initialImages;
+  }
+
   updatePreview() {
     if (!this.images.length) {
-      this.updateImages();
+      this.reInitImages();
     }
     const nextImage = this.images[0];
-    this.preview.setAttribute("src", nextImage.src);
+    this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {
@@ -403,6 +483,12 @@ template.innerHTML = `
       pointer-events: none;
       max-width: 150px;
       opacity: 0;
+    }
+    
+    @media only screen and (max-device-width: 480px) {
+      #next-photo-preview {
+        visibility: hidden;
+      }
     }
   </style>
   <img id="next-photo-preview" />

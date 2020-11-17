@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.0
+
+* initialization refactoring
+* enable component functionality only after preloading all images
+* hide preview on mobile devices
+
 ## 1.0.3
 
 * preload images from prepared cargo source

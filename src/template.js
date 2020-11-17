@@ -27,6 +27,12 @@ template.innerHTML = `
       max-width: 150px;
       opacity: 0;
     }
+    
+    @media only screen and (max-device-width: 480px) {
+      #next-photo-preview {
+        visibility: hidden;
+      }
+    }
   </style>
   <img id="next-photo-preview" />
   <canvas id="canvas"></canvas>
