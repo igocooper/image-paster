@@ -130,10 +130,10 @@ exports.default = getClickWithinElement;
 
 /***/ }),
 
-/***/ "./helpers/get-image-size.js":
-/*!***********************************!*\
-  !*** ./helpers/get-image-size.js ***!
-  \***********************************/
+/***/ "./helpers/preload-image.js":
+/*!**********************************!*\
+  !*** ./helpers/preload-image.js ***!
+  \**********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -143,15 +143,11 @@ exports.default = getClickWithinElement;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const getImageSize = src => new Promise(res => {
+const preloadImage = src => new Promise(res => {
   const newImg = new Image();
 
   const onImgLoad = () => {
-    const height = newImg.height,
-          width = newImg.width;
-
-    res({ width, height });
-    console.log('loaded: ', src);
+    res(newImg);
     newImg.removeEventListener('load', onImgLoad);
   };
 
@@ -159,7 +155,7 @@ const getImageSize = src => new Promise(res => {
   newImg.src = src;
 });
 
-exports.default = getImageSize;
+exports.default = preloadImage;
 
 /***/ }),
 
@@ -229,9 +225,9 @@ var _getClickWithinElement = __webpack_require__(/*! ./helpers/get-click-within-
 
 var _getClickWithinElement2 = _interopRequireDefault(_getClickWithinElement);
 
-var _getImageSize = __webpack_require__(/*! ./helpers/get-image-size */ "./helpers/get-image-size.js");
+var _preloadImage = __webpack_require__(/*! ./helpers/preload-image */ "./helpers/preload-image.js");
 
-var _getImageSize2 = _interopRequireDefault(_getImageSize);
+var _preloadImage2 = _interopRequireDefault(_preloadImage);
 
 var _wait = __webpack_require__(/*! ./helpers/wait */ "./helpers/wait.js");
 
@@ -393,10 +389,11 @@ class ImagePaster extends HTMLElement {
             imgWidth: image.width,
             originalImgWidth
           });
-          yield (0, _getImageSize2.default)(imgSrc);
+          const element = yield (0, _preloadImage2.default)(imgSrc);
 
           return _extends({}, image, {
-            src: imgSrc
+            src: imgSrc,
+            element
           });
         });
 

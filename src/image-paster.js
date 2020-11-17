@@ -1,6 +1,6 @@
 import constants from './constants';
 import getClickWithinElement from './helpers/get-click-within-element';
-import getImageSize from './helpers/get-image-size';
+import preloadImage from './helpers/preload-image';
 import wait from './helpers/wait';
 import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
 import template from './template';
@@ -132,11 +132,12 @@ class ImagePaster extends HTMLElement {
           imgWidth: image.width,
           originalImgWidth,
         });
-        await getImageSize(imgSrc);
+        const element = await preloadImage(imgSrc);
 
         return {
           ...image,
           src: imgSrc,
+          element,
         };
       })
     );

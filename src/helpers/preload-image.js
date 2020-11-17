@@ -1,11 +1,9 @@
-const getImageSize = (src) =>
+const preloadImage= (src) =>
   new Promise((res) => {
     const newImg = new Image();
 
     const onImgLoad = () => {
-      const { height, width } = newImg;
-      res({ width, height });
-      console.log('loaded: ', src);
+      res(newImg);
       newImg.removeEventListener('load', onImgLoad);
     };
 
@@ -13,4 +11,4 @@ const getImageSize = (src) =>
     newImg.src = src;
   });
 
-export default getImageSize;
+export default preloadImage;

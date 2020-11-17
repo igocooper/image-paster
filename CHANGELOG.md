@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.3
+
+* fix bug with redundant image src from original image element
+
 ## 1.1.2
 
 * fix bug with image re-initialization it's no more using references to arrays
