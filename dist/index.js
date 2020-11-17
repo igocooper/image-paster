@@ -172,10 +172,10 @@ exports.default = preloadImage;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const prepareCargoMediaSource = ({ src, imgWidth, originalImgWidth }) => {
-  const width = imgWidth !== originalImgWidth && imgWidth * 2 < originalImgWidth ? imgWidth * 2 : originalImgWidth;
+const prepareCargoMediaSource = ({ src, imgWidth }) => {
+  const width = (imgWidth * 2).toFixed();
 
-  return src.replace('/t/original/', `/w/${width.toFixed()}/q/75/`);
+  return src.replace('/t/original/', `/w/${width}/q/75/`);
 };
 
 exports.default = prepareCargoMediaSource;
@@ -383,21 +383,15 @@ class ImagePaster extends HTMLElement {
       }
       return Promise.all(images.map((() => {
         var _ref = _asyncToGenerator(function* (image) {
-          const originalImgWidth = image.element.getAttribute('width');
           const imgSrc = (0, _prepareCargoMediaSource2.default)({
             src: image.src,
-            imgWidth: image.width,
-            originalImgWidth
+            imgWidth: image.width
           });
 
           // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
-          const element = yield (0, _preloadImage2.default)(imgSrc);
-          element.setAttribute('width', image.width);
-          element.setAttribute('height', image.height);
-
+          element.setAttribute('src', imgSrc);
           return _extends({}, image, {
-            src: imgSrc,
-            element
+            src: imgSrc
           });
         });
 

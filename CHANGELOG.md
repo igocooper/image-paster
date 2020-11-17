@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.5
+
+* fix bug with element dimensions we are now using element from it's reference
+
 ## 1.1.4
 
 * fix bug with drawing incorrect image sizes into canvas

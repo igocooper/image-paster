@@ -126,22 +126,16 @@ class ImagePaster extends HTMLElement {
     }
     return Promise.all(
       images.map(async (image) => {
-        const originalImgWidth = image.element.getAttribute('width');
         const imgSrc = prepareCargoMediaSource({
           src: image.src,
           imgWidth: image.width,
-          originalImgWidth,
         });
 
         // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
-        const element = await preloadImage(imgSrc);
-        element.setAttribute('width', image.width);
-        element.setAttribute('height', image.height);
-
+        element.setAttribute('src', imgSrc);
         return {
           ...image,
           src: imgSrc,
-          element,
         };
       })
     );
