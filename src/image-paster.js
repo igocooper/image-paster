@@ -1,8 +1,8 @@
 import constants from './constants';
 import getClickWithinElement from './helpers/get-click-within-element';
-import preloadImage from './helpers/preload-image';
-import wait from './helpers/wait';
-import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
+// import preloadImage from './helpers/preload-image';
+// import wait from './helpers/wait';
+// import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
 import template from './template';
 
 class ImagePaster extends HTMLElement {
@@ -36,8 +36,6 @@ class ImagePaster extends HTMLElement {
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updatePreview = this.updatePreview.bind(this);
     this.updateImages = this.updateImages.bind(this);
-    this.initImages = this.initImages.bind(this);
-    this.reInitImages = this.reInitImages.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -83,27 +81,13 @@ class ImagePaster extends HTMLElement {
     this.updatePreview();
   }
 
-  async init() {
-    // timeout to not abuse call stack limit
-    await wait(100);
-
+  init() {
     this.updateImages();
-    const firstImage = this.images[0];
-    const isImagesSizesReady = firstImage.width > 0;
 
-    if (isImagesSizesReady) {
-      // preload images and and store initial images for further usage
-      this.initialImages = await this.initImages(this.images);
-
-      this.reInitImages();
-      this.updatePreview();
-      // add event listeners to canvas
-      this.canvas.addEventListener('mousedown', this.handleMouseClick);
-      this.canvas.addEventListener('mousemove', this.handleMouseMove);
-      return;
-    }
-    // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
-    this.init();
+    this.updatePreview();
+    // add event listeners to canvas
+    this.canvas.addEventListener('mousedown', this.handleMouseClick);
+    this.canvas.addEventListener('mousemove', this.handleMouseMove);
   }
 
   updateImages() {
@@ -113,47 +97,21 @@ class ImagePaster extends HTMLElement {
       );
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')].map((image) => {
-      const src = image.getAttribute('data-src');
-      const { width, height } = image.getBoundingClientRect();
-      return { width, height, src, element: image };
+    this.images = [...this.gallery.querySelectorAll('img')].forEach((image) => {
+      image.setAttribute('src', image.getAttribute('data-src'));
     });
-  }
-
-  async initImages(images) {
-    if (!images) {
-      throw new Error('Oops! Something went wrong, images were NOT collected 💩');
-    }
-    return Promise.all(
-      images.map(async (image) => {
-        const imgSrc = prepareCargoMediaSource({
-          src: image.src,
-        });
-
-        return {
-          ...image,
-          src: imgSrc,
-          'data-src': image.src,
-        };
-      })
-    );
-  }
-
-  reInitImages() {
-    this.images = [...this.initialImages];
-
   }
 
   updatePreview() {
     if (!this.images.length) {
-      this.reInitImages();
+      this.updateImages();
     }
     const nextImage = this.images[0];
     this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {
-    return this.images.shift().element;
+    return this.images.shift();
   }
 }
 

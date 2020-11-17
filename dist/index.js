@@ -130,81 +130,6 @@ exports.default = getClickWithinElement;
 
 /***/ }),
 
-/***/ "./helpers/preload-image.js":
-/*!**********************************!*\
-  !*** ./helpers/preload-image.js ***!
-  \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const preloadImage = src => new Promise(res => {
-  const newImg = new Image();
-
-  const onImgLoad = () => {
-    res(newImg);
-    newImg.removeEventListener('load', onImgLoad);
-  };
-
-  newImg.addEventListener('load', onImgLoad);
-  newImg.src = src;
-});
-
-exports.default = preloadImage;
-
-/***/ }),
-
-/***/ "./helpers/prepare-cargo-media-source.js":
-/*!***********************************************!*\
-  !*** ./helpers/prepare-cargo-media-source.js ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const prepareCargoMediaSource = ({ src, imgWidth }) => {
-  const width = (imgWidth * 2).toFixed();
-
-  return src.replace('/t/original/', `/w/${width}/q/75/`);
-};
-
-exports.default = prepareCargoMediaSource;
-
-/***/ }),
-
-/***/ "./helpers/wait.js":
-/*!*************************!*\
-  !*** ./helpers/wait.js ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const wait = timer => new Promise(res => {
-  setTimeout(() => {
-    res();
-  }, timer);
-});
-
-exports.default = wait;
-
-/***/ }),
-
 /***/ "./image-paster.js":
 /*!*************************!*\
   !*** ./image-paster.js ***!
@@ -215,8 +140,6 @@ exports.default = wait;
 "use strict";
 
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _constants = __webpack_require__(/*! ./constants */ "./constants/index.js");
 
 var _constants2 = _interopRequireDefault(_constants);
@@ -225,25 +148,11 @@ var _getClickWithinElement = __webpack_require__(/*! ./helpers/get-click-within-
 
 var _getClickWithinElement2 = _interopRequireDefault(_getClickWithinElement);
 
-var _preloadImage = __webpack_require__(/*! ./helpers/preload-image */ "./helpers/preload-image.js");
-
-var _preloadImage2 = _interopRequireDefault(_preloadImage);
-
-var _wait = __webpack_require__(/*! ./helpers/wait */ "./helpers/wait.js");
-
-var _wait2 = _interopRequireDefault(_wait);
-
-var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-media-source */ "./helpers/prepare-cargo-media-source.js");
-
-var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
-
 var _template = __webpack_require__(/*! ./template */ "./template.js");
 
 var _template2 = _interopRequireDefault(_template);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 class ImagePaster extends HTMLElement {
   constructor() {
@@ -276,8 +185,6 @@ class ImagePaster extends HTMLElement {
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updatePreview = this.updatePreview.bind(this);
     this.updateImages = this.updateImages.bind(this);
-    this.initImages = this.initImages.bind(this);
-    this.reInitImages = this.reInitImages.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -333,30 +240,12 @@ class ImagePaster extends HTMLElement {
   }
 
   init() {
-    var _this = this;
+    this.updateImages();
 
-    return _asyncToGenerator(function* () {
-      // timeout to not abuse call stack limit
-      yield (0, _wait2.default)(100);
-
-      _this.updateImages();
-      const firstImage = _this.images[0];
-      const isImagesSizesReady = firstImage.width > 0;
-
-      if (isImagesSizesReady) {
-        // preload images and and store initial images for further usage
-        _this.initialImages = yield _this.initImages(_this.images);
-
-        _this.reInitImages();
-        _this.updatePreview();
-        // add event listeners to canvas
-        _this.canvas.addEventListener('mousedown', _this.handleMouseClick);
-        _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
-        return;
-      }
-      // Recursively load images till they will be rendered into DOM with actual size so we can read it using el.getBoundingClientRect()
-      _this.init();
-    })();
+    this.updatePreview();
+    // add event listeners to canvas
+    this.canvas.addEventListener('mousedown', this.handleMouseClick);
+    this.canvas.addEventListener('mousemove', this.handleMouseMove);
   }
 
   updateImages() {
@@ -364,58 +253,27 @@ class ImagePaster extends HTMLElement {
       throw new Error('You should use image-paster only right after gallery block for proper initialization');
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')].map(image => {
-      const src = image.getAttribute('data-src');
-
-      var _image$getBoundingCli = image.getBoundingClientRect();
-
-      const width = _image$getBoundingCli.width,
-            height = _image$getBoundingCli.height;
-
-      return { width, height, src, element: image };
+    this.images = [...this.gallery.querySelectorAll('img')].forEach(image => {
+      image.setAttribute('src', image.getAttribute('data-src'));
     });
-  }
-
-  initImages(images) {
-    return _asyncToGenerator(function* () {
-      if (!images) {
-        throw new Error('Oops! Something went wrong, images were NOT collected 💩');
-      }
-      return Promise.all(images.map((() => {
-        var _ref = _asyncToGenerator(function* (image) {
-          const imgSrc = (0, _prepareCargoMediaSource2.default)({
-            src: image.src
-          });
-
-          return _extends({}, image, {
-            src: imgSrc,
-            'data-src': image.src
-          });
-        });
-
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      })()));
-    })();
-  }
-
-  reInitImages() {
-    this.images = [...this.initialImages];
   }
 
   updatePreview() {
     if (!this.images.length) {
-      this.reInitImages();
+      this.updateImages();
     }
     const nextImage = this.images[0];
     this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {
-    return this.images.shift().element;
+    return this.images.shift();
   }
 }
+// import preloadImage from './helpers/preload-image';
+// import wait from './helpers/wait';
+// import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
+
 
 customElements.define(_constants2.default.CONTAINER_TAG, ImagePaster);
 
