@@ -5,7 +5,7 @@ const getImageSize = (src) =>
     const onImgLoad = () => {
       const { height, width } = newImg;
       res({ width, height });
-
+      console.log('loaded: ', src);
       newImg.removeEventListener('load', onImgLoad);
     };
 

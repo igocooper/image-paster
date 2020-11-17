@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.0.3
+
+* preload images from prepared cargo source
+* add helper to prepare cargo source
+
 ## 1.0.2
 
 * fix bug with preloading images

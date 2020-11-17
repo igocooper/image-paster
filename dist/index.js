@@ -130,6 +130,58 @@ exports.default = getClickWithinElement;
 
 /***/ }),
 
+/***/ "./helpers/get-image-size.js":
+/*!***********************************!*\
+  !*** ./helpers/get-image-size.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const getImageSize = src => new Promise(res => {
+  const newImg = new Image();
+
+  const onImgLoad = () => {
+    const height = newImg.height,
+          width = newImg.width;
+
+    res({ width, height });
+    console.log('loaded: ', src);
+    newImg.removeEventListener('load', onImgLoad);
+  };
+
+  newImg.addEventListener('load', onImgLoad);
+  newImg.src = src;
+});
+
+exports.default = getImageSize;
+
+/***/ }),
+
+/***/ "./helpers/prepare-cargo-media-source.js":
+/*!***********************************************!*\
+  !*** ./helpers/prepare-cargo-media-source.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const prepareCargoMediaSource = (src, imgWidth) => src.replace('/t/original/', `/w/${imgWidth}/q/75/`);
+
+exports.default = prepareCargoMediaSource;
+
+/***/ }),
+
 /***/ "./image-paster.js":
 /*!*************************!*\
   !*** ./image-paster.js ***!
@@ -147,6 +199,14 @@ var _constants2 = _interopRequireDefault(_constants);
 var _getClickWithinElement = __webpack_require__(/*! ./helpers/get-click-within-element */ "./helpers/get-click-within-element.js");
 
 var _getClickWithinElement2 = _interopRequireDefault(_getClickWithinElement);
+
+var _getImageSize = __webpack_require__(/*! ./helpers/get-image-size */ "./helpers/get-image-size.js");
+
+var _getImageSize2 = _interopRequireDefault(_getImageSize);
+
+var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-media-source */ "./helpers/prepare-cargo-media-source.js");
+
+var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
 
 var _template = __webpack_require__(/*! ./template */ "./template.js");
 
@@ -173,7 +233,6 @@ class ImagePaster extends HTMLElement {
     this.canvas.addEventListener("mousedown", this.handleMouseClick);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
 
-    this.hideGallery();
     this.setCanvasSize();
     this.initializeImages();
   }
@@ -189,7 +248,6 @@ class ImagePaster extends HTMLElement {
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updateImages = this.updateImages.bind(this);
     this.initializeImages = this.initializeImages.bind(this);
-    this.hideGallery = this.hideGallery.bind(this);
   }
 
   setCanvasSize() {
@@ -214,8 +272,6 @@ class ImagePaster extends HTMLElement {
   addImage(img, x, y) {
     const imgWidth = img.width;
     const imgHeight = img.height;
-    console.log("w", imgWidth);
-    console.log("h", imgHeight);
     const imgX = x - imgWidth / 2;
     const imgY = y - imgHeight / 2;
 
@@ -261,13 +317,10 @@ class ImagePaster extends HTMLElement {
     }, 100);
   }
 
-  hideGallery() {
-    this.gallery.setAttribute('style', 'opacity: 0; position: absolute; pointer-events: none;');
-  }
-
   updateImages() {
     this.images = [...this.gallery.querySelectorAll("img")].map(image => {
-      const src = image.getAttribute("data-src");
+      const src = (0, _prepareCargoMediaSource2.default)(image.getAttribute("data-src"));
+      (0, _getImageSize2.default)(src);
 
       var _image$getBoundingCli = image.getBoundingClientRect();
 

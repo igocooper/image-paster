@@ -1,6 +1,7 @@
 import constants from "./constants";
 import getClickWithinElement from "./helpers/get-click-within-element";
 import getImageSize from "./helpers/get-image-size";
+import prepareCargoMediaSource from "./helpers/prepare-cargo-media-source";
 import template from "./template";
 
 class ImagePaster extends HTMLElement {
@@ -57,8 +58,6 @@ class ImagePaster extends HTMLElement {
   addImage(img, x, y) {
     const imgWidth = img.width;
     const imgHeight = img.height;
-    console.log("w", imgWidth);
-    console.log("h", imgHeight);
     const imgX = x - imgWidth / 2;
     const imgY = y - imgHeight / 2;
 
@@ -102,7 +101,7 @@ class ImagePaster extends HTMLElement {
   updateImages() {
     this.images = [...this.gallery.querySelectorAll("img")].map(
       (image) => {
-        const src = image.getAttribute("data-src");
+        const src = prepareCargoMediaSource(image.getAttribute("data-src"));
         getImageSize(src);
         const { width, height } = image.getBoundingClientRect();
         return { width, height, src, element: image };
