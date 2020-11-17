@@ -132,7 +132,7 @@ class ImagePaster extends HTMLElement {
         });
 
         // we replace original image element node cuz it's being lazy loaded, so we won't be able to re-use it as it is right now.
-        element.setAttribute('src', imgSrc);
+        image.element.setAttribute('src', imgSrc);
         return {
           ...image,
           src: imgSrc,
