@@ -1,8 +1,8 @@
 import constants from './constants';
 import getClickWithinElement from './helpers/get-click-within-element';
-// import preloadImage from './helpers/preload-image';
-// import wait from './helpers/wait';
-// import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
+import preloadImage from './helpers/preload-image';
+import wait from './helpers/wait';
+import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
 import template from './template';
 
 class ImagePaster extends HTMLElement {
@@ -35,7 +35,10 @@ class ImagePaster extends HTMLElement {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updatePreview = this.updatePreview.bind(this);
-    this.updateImages = this.updateImages.bind(this);
+    this.initImages = this.initImages.bind(this);
+    this.reInitImages = this.reInitImages.bind(this);
+    this.prepareImagesData = this.prepareImagesData.bind(this);
+    this.calculateImageWidth = this.calculateImageWidth.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -81,38 +84,115 @@ class ImagePaster extends HTMLElement {
     this.updatePreview();
   }
 
-  init() {
-    this.updateImages();
+  async init() {
+    // timeout to not abuse call stack limit
+    await wait(100);
 
-    this.updatePreview();
-    // add event listeners to canvas
-    this.canvas.addEventListener('mousedown', this.handleMouseClick);
-    this.canvas.addEventListener('mousemove', this.handleMouseMove);
+    const isGalleryInitialized = this.gallery.className.includes('initialized');
+
+    if (isGalleryInitialized) {
+      const imagesFromDom = this.getImagesFromDom();
+      // preload images and and store initial images for further usage
+      this.initialImages = await this.initImages(imagesFromDom);
+
+      this.reInitImages();
+      this.updatePreview();
+      // add event listeners to canvas
+      this.canvas.addEventListener('mousedown', this.handleMouseClick);
+      this.canvas.addEventListener('mousemove', this.handleMouseMove);
+      return;
+    }
+    // Recursively wait till galleru is initialized
+    this.init();
   }
 
-  updateImages() {
+  getImagesFromDom() {
     if (!this.gallery || !this.gallery.querySelectorAll) {
       throw new Error(
         'You should use image-paster only right after gallery block for proper initialization'
       );
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')];
-    this.images.forEach((image) => {
-      image.setAttribute('src', image.getAttribute('data-src'));
+    return [...this.gallery.querySelectorAll('img')];
+  }
+
+  async initImages(images) {
+    if (!images) {
+      throw new Error('Oops! Something went wrong, images were NOT collected 💩');
+    }
+
+    const preparedImagesData = this.prepareImagesData(images);
+
+    return Promise.all(
+      preparedImagesData.map(async (image) => {
+        const imgSrc = prepareCargoMediaSource({
+          src: image.src,
+          imgWidth: image.width,
+          originalImgWidth: image.originalImgWidth,
+        });
+
+        const imageElement = await preloadImage(imgSrc, image.width, image.height);
+        return {
+          ...image,
+          src: imgSrc,
+          element: imageElement,
+        };
+      })
+    );
+  }
+
+  prepareImagesData(images) {
+    if (!this.gallery) {
+      throw new Error('You should use prepare image data only right after gallery block proper initialization');
+    }
+    const metaRaw = JSON.stringify(this.gallery.getAttribute('data-gallery'));
+    const galleryMetaData = metaRaw.data['meta_data'];
+
+    return images.map((image, index) => {
+      const imageWidthInPercents = galleryMetaData[index].width;
+      const width = ImagePaster.calculateImageWidth(this.gallery, imageWidthInPercents);
+      const originalImgHeight = Number.parseInt(image.getAttribute('height'));
+      const originalImgWidth = Number.parseInt(image.getAttribute('width'));
+      const height = ImagePaster.getSameRatioHeightFromWidth(width, originalImgWidth, originalImgHeight);
+      const src = image.getAttribute('data-src');
+
+      return {
+        originalImgWidth,
+        originalImgHeight,
+        width,
+        height,
+        src,
+      }
     });
+  }
+
+  static calculateImageWidth(galleryNode, widthInPercent) {
+    // we remove gallery left and right padding  from it's width to get precise result
+    const galleryStyles = window.getComputedStyle(galleryNode);
+    const galleryPadding = Number.parseFloat(galleryStyles.padding);
+    const galleryWidth = Number.parseFloat(galleryStyles.width) - galleryPadding * 2;
+
+    return galleryWidth / 100 * widthInPercent;
+  }
+
+  static getSameRatioHeightFromWidth(width, originalWidth, originalHeight) {
+    return (originalHeight / originalWidth) * width;
+  }
+
+  reInitImages() {
+    this.images = [...this.initialImages];
   }
 
   updatePreview() {
     if (!this.images.length) {
-      this.updateImages();
+      this.reInitImages();
     }
     const nextImage = this.images[0];
     this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {
-    return this.images.shift();
+    return this.images.shift().element;
   }
 }
 

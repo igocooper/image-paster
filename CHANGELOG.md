@@ -2,7 +2,7 @@
 
 ## DEV
 
-* WIP
+* calculating images based on gallery meta instead of parsing it
 
 ## 1.1.5
 

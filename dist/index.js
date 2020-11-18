@@ -130,6 +130,81 @@ exports.default = getClickWithinElement;
 
 /***/ }),
 
+/***/ "./helpers/preload-image.js":
+/*!**********************************!*\
+  !*** ./helpers/preload-image.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const preloadImage = (src, width, height) => new Promise(res => {
+  const newImg = new Image();
+
+  const onImgLoad = () => {
+    res(newImg);
+    newImg.removeEventListener('load', onImgLoad);
+  };
+
+  newImg.addEventListener('load', onImgLoad);
+  newImg.src = src;
+});
+
+exports.default = preloadImage;
+
+/***/ }),
+
+/***/ "./helpers/prepare-cargo-media-source.js":
+/*!***********************************************!*\
+  !*** ./helpers/prepare-cargo-media-source.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const prepareCargoMediaSource = ({ src, imgWidth, originalImgWidth }) => {
+  const width = imgWidth !== originalImgWidth && imgWidth * 2 < originalImgWidth ? imgWidth * 2 : originalImgWidth;
+
+  return src.replace('/t/original/', `/w/${width.toFixed()}/q/75/`);
+};
+
+exports.default = prepareCargoMediaSource;
+
+/***/ }),
+
+/***/ "./helpers/wait.js":
+/*!*************************!*\
+  !*** ./helpers/wait.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const wait = timer => new Promise(res => {
+  setTimeout(() => {
+    res();
+  }, timer);
+});
+
+exports.default = wait;
+
+/***/ }),
+
 /***/ "./image-paster.js":
 /*!*************************!*\
   !*** ./image-paster.js ***!
@@ -140,6 +215,8 @@ exports.default = getClickWithinElement;
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _constants = __webpack_require__(/*! ./constants */ "./constants/index.js");
 
 var _constants2 = _interopRequireDefault(_constants);
@@ -148,11 +225,25 @@ var _getClickWithinElement = __webpack_require__(/*! ./helpers/get-click-within-
 
 var _getClickWithinElement2 = _interopRequireDefault(_getClickWithinElement);
 
+var _preloadImage = __webpack_require__(/*! ./helpers/preload-image */ "./helpers/preload-image.js");
+
+var _preloadImage2 = _interopRequireDefault(_preloadImage);
+
+var _wait = __webpack_require__(/*! ./helpers/wait */ "./helpers/wait.js");
+
+var _wait2 = _interopRequireDefault(_wait);
+
+var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-media-source */ "./helpers/prepare-cargo-media-source.js");
+
+var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
+
 var _template = __webpack_require__(/*! ./template */ "./template.js");
 
 var _template2 = _interopRequireDefault(_template);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 class ImagePaster extends HTMLElement {
   constructor() {
@@ -184,7 +275,10 @@ class ImagePaster extends HTMLElement {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.setCanvasSize = this.setCanvasSize.bind(this);
     this.updatePreview = this.updatePreview.bind(this);
-    this.updateImages = this.updateImages.bind(this);
+    this.initImages = this.initImages.bind(this);
+    this.reInitImages = this.reInitImages.bind(this);
+    this.prepareImagesData = this.prepareImagesData.bind(this);
+    this.calculateImageWidth = this.calculateImageWidth.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -240,41 +334,125 @@ class ImagePaster extends HTMLElement {
   }
 
   init() {
-    this.updateImages();
+    var _this = this;
 
-    this.updatePreview();
-    // add event listeners to canvas
-    this.canvas.addEventListener('mousedown', this.handleMouseClick);
-    this.canvas.addEventListener('mousemove', this.handleMouseMove);
+    return _asyncToGenerator(function* () {
+      // timeout to not abuse call stack limit
+      yield (0, _wait2.default)(100);
+
+      const isGalleryInitialized = _this.gallery.className.includes('initialized');
+
+      if (isGalleryInitialized) {
+        const imagesFromDom = _this.getImagesFromDom();
+        // preload images and and store initial images for further usage
+        _this.initialImages = yield _this.initImages(imagesFromDom);
+
+        _this.reInitImages();
+        _this.updatePreview();
+        // add event listeners to canvas
+        _this.canvas.addEventListener('mousedown', _this.handleMouseClick);
+        _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
+        return;
+      }
+      // Recursively wait till galleru is initialized
+      _this.init();
+    })();
   }
 
-  updateImages() {
+  getImagesFromDom() {
     if (!this.gallery || !this.gallery.querySelectorAll) {
       throw new Error('You should use image-paster only right after gallery block for proper initialization');
     }
 
-    this.images = [...this.gallery.querySelectorAll('img')];
-    this.images.forEach(image => {
-      image.setAttribute('src', image.getAttribute('data-src'));
+    return [...this.gallery.querySelectorAll('img')];
+  }
+
+  initImages(images) {
+    var _this2 = this;
+
+    return _asyncToGenerator(function* () {
+      if (!images) {
+        throw new Error('Oops! Something went wrong, images were NOT collected 💩');
+      }
+
+      const preparedImagesData = _this2.prepareImagesData(images);
+
+      return Promise.all(preparedImagesData.map((() => {
+        var _ref = _asyncToGenerator(function* (image) {
+          const imgSrc = (0, _prepareCargoMediaSource2.default)({
+            src: image.src,
+            imgWidth: image.width,
+            originalImgWidth: image.originalImgWidth
+          });
+
+          const imageElement = yield (0, _preloadImage2.default)(imgSrc, image.width, image.height);
+          return _extends({}, image, {
+            src: imgSrc,
+            element: imageElement
+          });
+        });
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      })()));
+    })();
+  }
+
+  prepareImagesData(images) {
+    if (!this.gallery) {
+      throw new Error('You should use prepare image data only right after gallery block proper initialization');
+    }
+    const metaRaw = JSON.stringify(this.gallery.getAttribute('data-gallery'));
+    const galleryMetaData = metaRaw.data['meta_data'];
+
+    return images.map((image, index) => {
+      const imageWidthInPercents = galleryMetaData[index].width;
+      const width = ImagePaster.calculateImageWidth(this.gallery, imageWidthInPercents);
+      const originalImgHeight = Number.parseInt(image.getAttribute('height'));
+      const originalImgWidth = Number.parseInt(image.getAttribute('width'));
+      const height = ImagePaster.getSameRatioHeightFromWidth(width, originalImgWidth, originalImgHeight);
+      const src = image.getAttribute('data-src');
+
+      return {
+        originalImgWidth,
+        originalImgHeight,
+        width,
+        height,
+        src
+      };
     });
+  }
+
+  static calculateImageWidth(galleryNode, widthInPercent) {
+    // we remove gallery left and right padding  from it's width to get precise result
+    const galleryStyles = window.getComputedStyle(galleryNode);
+    const galleryPadding = Number.parseFloat(galleryStyles.padding);
+    const galleryWidth = Number.parseFloat(galleryStyles.width) - galleryPadding * 2;
+
+    return galleryWidth / 100 * widthInPercent;
+  }
+
+  static getSameRatioHeightFromWidth(width, originalWidth, originalHeight) {
+    return originalHeight / originalWidth * width;
+  }
+
+  reInitImages() {
+    this.images = [...this.initialImages];
   }
 
   updatePreview() {
     if (!this.images.length) {
-      this.updateImages();
+      this.reInitImages();
     }
     const nextImage = this.images[0];
     this.preview.setAttribute('src', nextImage.src);
   }
 
   getImage() {
-    return this.images.shift();
+    return this.images.shift().element;
   }
 }
-// import preloadImage from './helpers/preload-image';
-// import wait from './helpers/wait';
-// import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
-
 
 customElements.define(_constants2.default.CONTAINER_TAG, ImagePaster);
 

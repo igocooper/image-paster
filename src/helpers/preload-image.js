@@ -1,4 +1,4 @@
-const preloadImage= (src) =>
+const preloadImage= (src, width, height) =>
   new Promise((res) => {
     const newImg = new Image();
 
