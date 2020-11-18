@@ -1,6 +1,6 @@
 const preloadImage= (src, width, height) =>
   new Promise((res) => {
-    const newImg = new Image();
+    const newImg = new Image(width, height);
 
     const onImgLoad = () => {
       res(newImg);
