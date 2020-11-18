@@ -38,7 +38,6 @@ class ImagePaster extends HTMLElement {
     this.initImages = this.initImages.bind(this);
     this.reInitImages = this.reInitImages.bind(this);
     this.prepareImagesData = this.prepareImagesData.bind(this);
-    this.calculateImageWidth = this.calculateImageWidth.bind(this);
     this.init = this.init.bind(this);
   }
 
