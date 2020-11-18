@@ -402,7 +402,7 @@ class ImagePaster extends HTMLElement {
     if (!this.gallery) {
       throw new Error('You should use prepare image data only right after gallery block proper initialization');
     }
-    const metaRaw = JSON.stringify(this.gallery.getAttribute('data-gallery'));
+    const metaRaw = JSON.parse(this.gallery.getAttribute('data-gallery'));
     const galleryMetaData = metaRaw.data['meta_data'];
 
     return images.map((image, index) => {
