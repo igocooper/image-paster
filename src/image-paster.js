@@ -3,6 +3,9 @@ import getClickWithinElement from './helpers/get-click-within-element';
 import preloadImage from './helpers/preload-image';
 import wait from './helpers/wait';
 import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
+import isInsideEditor from './helpers/is-insed-editor';
+import getSameRatioHeightFromWidth from './helpers/get-same-ratio-height-from-width';
+import calculateImageWidth from './helpers/calculate-image-width';
 import template from './template';
 
 class ImagePaster extends HTMLElement {
@@ -22,6 +25,9 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
+    if (isInsideEditor()) {
+      this.hideGallery();
+    }
     this.init();
   }
 
@@ -38,6 +44,7 @@ class ImagePaster extends HTMLElement {
     this.initImages = this.initImages.bind(this);
     this.reInitImages = this.reInitImages.bind(this);
     this.prepareImagesData = this.prepareImagesData.bind(this);
+    this.hideGallery = this.hideGallery.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -101,7 +108,7 @@ class ImagePaster extends HTMLElement {
       this.canvas.addEventListener('mousemove', this.handleMouseMove);
       return;
     }
-    // Recursively wait till galleru is initialized
+    // Recursively wait till gallery is initialized
     this.init();
   }
 
@@ -142,17 +149,23 @@ class ImagePaster extends HTMLElement {
 
   prepareImagesData(images) {
     if (!this.gallery) {
-      throw new Error('You should use prepare image data only right after gallery block proper initialization');
+      throw new Error(
+        'You should use prepare image data only right after gallery block proper initialization'
+      );
     }
     const metaRaw = JSON.parse(this.gallery.getAttribute('data-gallery'));
     const galleryMetaData = metaRaw.data['meta_data'];
 
     return images.map((image, index) => {
       const imageWidthInPercents = galleryMetaData[index].width;
-      const width = ImagePaster.calculateImageWidth(this.gallery, imageWidthInPercents);
+      const width = calculateImageWidth(this.gallery, imageWidthInPercents);
       const originalImgHeight = Number.parseInt(image.getAttribute('height'));
       const originalImgWidth = Number.parseInt(image.getAttribute('width'));
-      const height = ImagePaster.getSameRatioHeightFromWidth(width, originalImgWidth, originalImgHeight);
+      const height = getSameRatioHeightFromWidth(
+        width,
+        originalImgWidth,
+        originalImgHeight
+      );
       const src = image.getAttribute('data-src');
 
       return {
@@ -161,21 +174,12 @@ class ImagePaster extends HTMLElement {
         width,
         height,
         src,
-      }
+      };
     });
   }
 
-  static calculateImageWidth(galleryNode, widthInPercent) {
-    // we remove gallery left and right padding  from it's width to get precise result
-    const galleryStyles = window.getComputedStyle(galleryNode);
-    const galleryPadding = Number.parseFloat(galleryStyles.padding);
-    const galleryWidth = Number.parseFloat(galleryStyles.width) - galleryPadding * 2;
-
-    return galleryWidth / 100 * widthInPercent;
-  }
-
-  static getSameRatioHeightFromWidth(width, originalWidth, originalHeight) {
-    return (originalHeight / originalWidth) * width;
+  hideGallery() {
+    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none;';
   }
 
   reInitImages() {

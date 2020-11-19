@@ -105,6 +105,32 @@ exports.default = {
 
 /***/ }),
 
+/***/ "./helpers/calculate-image-width.js":
+/*!******************************************!*\
+  !*** ./helpers/calculate-image-width.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const calculateImageWidth = (galleryNode, widthInPercent) => {
+  // we remove gallery left and right padding  from it's width to get precise result
+  const galleryStyles = window.getComputedStyle(galleryNode);
+  const galleryPadding = Number.parseFloat(galleryStyles.padding);
+  const galleryWidth = Number.parseFloat(galleryStyles.width) - galleryPadding * 2;
+
+  return galleryWidth / 100 * widthInPercent;
+};
+
+exports.default = calculateImageWidth;
+
+/***/ }),
+
 /***/ "./helpers/get-click-within-element.js":
 /*!*********************************************!*\
   !*** ./helpers/get-click-within-element.js ***!
@@ -127,6 +153,46 @@ const getClickWithinElement = event => {
 };
 
 exports.default = getClickWithinElement;
+
+/***/ }),
+
+/***/ "./helpers/get-same-ratio-height-from-width.js":
+/*!*****************************************************!*\
+  !*** ./helpers/get-same-ratio-height-from-width.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const getSameRatioHeightFromWidth = (width, originalWidth, originalHeight) => originalHeight / originalWidth * width;
+
+exports.default = getSameRatioHeightFromWidth;
+
+/***/ }),
+
+/***/ "./helpers/is-insed-editor.js":
+/*!************************************!*\
+  !*** ./helpers/is-insed-editor.js ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const isInsideEditor = () => {
+  return document.className.includes('admin-wrapper');
+};
+
+exports.default = isInsideEditor;
 
 /***/ }),
 
@@ -237,6 +303,18 @@ var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-m
 
 var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
 
+var _isInsedEditor = __webpack_require__(/*! ./helpers/is-insed-editor */ "./helpers/is-insed-editor.js");
+
+var _isInsedEditor2 = _interopRequireDefault(_isInsedEditor);
+
+var _getSameRatioHeightFromWidth = __webpack_require__(/*! ./helpers/get-same-ratio-height-from-width */ "./helpers/get-same-ratio-height-from-width.js");
+
+var _getSameRatioHeightFromWidth2 = _interopRequireDefault(_getSameRatioHeightFromWidth);
+
+var _calculateImageWidth = __webpack_require__(/*! ./helpers/calculate-image-width */ "./helpers/calculate-image-width.js");
+
+var _calculateImageWidth2 = _interopRequireDefault(_calculateImageWidth);
+
 var _template = __webpack_require__(/*! ./template */ "./template.js");
 
 var _template2 = _interopRequireDefault(_template);
@@ -262,6 +340,9 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
+    if ((0, _isInsedEditor2.default)()) {
+      this.hideGallery();
+    }
     this.init();
   }
 
@@ -278,6 +359,7 @@ class ImagePaster extends HTMLElement {
     this.initImages = this.initImages.bind(this);
     this.reInitImages = this.reInitImages.bind(this);
     this.prepareImagesData = this.prepareImagesData.bind(this);
+    this.hideGallery = this.hideGallery.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -353,7 +435,7 @@ class ImagePaster extends HTMLElement {
         _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
         return;
       }
-      // Recursively wait till galleru is initialized
+      // Recursively wait till gallery is initialized
       _this.init();
     })();
   }
@@ -407,10 +489,10 @@ class ImagePaster extends HTMLElement {
 
     return images.map((image, index) => {
       const imageWidthInPercents = galleryMetaData[index].width;
-      const width = ImagePaster.calculateImageWidth(this.gallery, imageWidthInPercents);
+      const width = (0, _calculateImageWidth2.default)(this.gallery, imageWidthInPercents);
       const originalImgHeight = Number.parseInt(image.getAttribute('height'));
       const originalImgWidth = Number.parseInt(image.getAttribute('width'));
-      const height = ImagePaster.getSameRatioHeightFromWidth(width, originalImgWidth, originalImgHeight);
+      const height = (0, _getSameRatioHeightFromWidth2.default)(width, originalImgWidth, originalImgHeight);
       const src = image.getAttribute('data-src');
 
       return {
@@ -423,17 +505,8 @@ class ImagePaster extends HTMLElement {
     });
   }
 
-  static calculateImageWidth(galleryNode, widthInPercent) {
-    // we remove gallery left and right padding  from it's width to get precise result
-    const galleryStyles = window.getComputedStyle(galleryNode);
-    const galleryPadding = Number.parseFloat(galleryStyles.padding);
-    const galleryWidth = Number.parseFloat(galleryStyles.width) - galleryPadding * 2;
-
-    return galleryWidth / 100 * widthInPercent;
-  }
-
-  static getSameRatioHeightFromWidth(width, originalWidth, originalHeight) {
-    return originalHeight / originalWidth * width;
+  hideGallery() {
+    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none;';
   }
 
   reInitImages() {
