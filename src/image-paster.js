@@ -3,7 +3,7 @@ import getClickWithinElement from './helpers/get-click-within-element';
 import preloadImage from './helpers/preload-image';
 import wait from './helpers/wait';
 import prepareCargoMediaSource from './helpers/prepare-cargo-media-source';
-import isInsideEditor from './helpers/is-insed-editor';
+import isInsideEditor from './helpers/is-inside-editor';
 import getSameRatioHeightFromWidth from './helpers/get-same-ratio-height-from-width';
 import calculateImageWidth from './helpers/calculate-image-width';
 import template from './template';

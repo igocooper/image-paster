@@ -175,10 +175,10 @@ exports.default = getSameRatioHeightFromWidth;
 
 /***/ }),
 
-/***/ "./helpers/is-insed-editor.js":
-/*!************************************!*\
-  !*** ./helpers/is-insed-editor.js ***!
-  \************************************/
+/***/ "./helpers/is-inside-editor.js":
+/*!*************************************!*\
+  !*** ./helpers/is-inside-editor.js ***!
+  \*************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -189,7 +189,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 const isInsideEditor = () => {
-  return document.className.includes('admin-wrapper');
+  return document.documentElement.className.includes('admin-wrapper');
 };
 
 exports.default = isInsideEditor;
@@ -303,9 +303,9 @@ var _prepareCargoMediaSource = __webpack_require__(/*! ./helpers/prepare-cargo-m
 
 var _prepareCargoMediaSource2 = _interopRequireDefault(_prepareCargoMediaSource);
 
-var _isInsedEditor = __webpack_require__(/*! ./helpers/is-insed-editor */ "./helpers/is-insed-editor.js");
+var _isInsideEditor = __webpack_require__(/*! ./helpers/is-inside-editor */ "./helpers/is-inside-editor.js");
 
-var _isInsedEditor2 = _interopRequireDefault(_isInsedEditor);
+var _isInsideEditor2 = _interopRequireDefault(_isInsideEditor);
 
 var _getSameRatioHeightFromWidth = __webpack_require__(/*! ./helpers/get-same-ratio-height-from-width */ "./helpers/get-same-ratio-height-from-width.js");
 
@@ -340,7 +340,7 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
-    if ((0, _isInsedEditor2.default)()) {
+    if ((0, _isInsideEditor2.default)()) {
       this.hideGallery();
     }
     this.init();
