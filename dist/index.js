@@ -189,7 +189,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 const isInsideEditor = () => {
-  return document.documentElement.className.includes('admin-wrapper');
+  if (window.location !== window.parent.location) {
+    const parentDocument = window.parent.document.documentElement;
+    return parentDocument.includes('admin-wrapper');
+  } else {
+    return false;
+  }
 };
 
 exports.default = isInsideEditor;
@@ -340,7 +345,7 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
-    if ((0, _isInsideEditor2.default)()) {
+    if (!(0, _isInsideEditor2.default)()) {
       this.hideGallery();
     }
     this.init();

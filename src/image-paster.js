@@ -25,7 +25,7 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
-    if (isInsideEditor()) {
+    if (!isInsideEditor()) {
       this.hideGallery();
     }
     this.init();
