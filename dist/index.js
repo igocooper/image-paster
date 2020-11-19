@@ -345,9 +345,6 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.setCanvasSize();
-    if (!(0, _isInsideEditor2.default)()) {
-      this.hideGallery();
-    }
     this.init();
   }
 
@@ -429,6 +426,9 @@ class ImagePaster extends HTMLElement {
       const isGalleryInitialized = _this.gallery.className.includes('initialized');
 
       if (isGalleryInitialized) {
+        if (!(0, _isInsideEditor2.default)()) {
+          _this.hideGallery();
+        }
         const imagesFromDom = _this.getImagesFromDom();
         // preload images and and store initial images for further usage
         _this.initialImages = yield _this.initImages(imagesFromDom);
