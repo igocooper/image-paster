@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.2
+
+* fix bug with gallery detection
+
 ## 1.2.1
 
 * fix bug with initialization when there is no gallery

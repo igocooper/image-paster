@@ -338,7 +338,6 @@ class ImagePaster extends HTMLElement {
     this.canvas = this.shadow.querySelector('#canvas');
     this.context = this.canvas.getContext('2d');
     this.preview = this.shadow.querySelector('#next-photo-preview');
-    this.gallery = this.previousElementSibling;
 
     this.bindMethods();
   }
@@ -434,9 +433,10 @@ class ImagePaster extends HTMLElement {
       // timeout to not abuse call stack limit
       yield (0, _wait2.default)(100);
 
-      const isGalleryInitialized = _this.gallery && _this.gallery.className.includes('initialized');
+      const isGalleryInitialized = _this.previousElementSibling && _this.previousElementSibling.className.includes('initialized');
 
       if (isGalleryInitialized) {
+        _this.gallery = _this.previousElementSibling;
         if (!(0, _isInsideEditor2.default)()) {
           _this.hideGallery();
         }
