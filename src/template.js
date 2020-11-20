@@ -17,6 +17,14 @@ template.innerHTML = `
     :host(:hover) #next-photo-preview {
         opacity: 1;
     }
+    
+    :host(:hover) #next-photo-preview.hidden {
+      opacity: 0;
+    }
+    
+    #canvas {
+      cursor: pointer;
+    }
 
     #next-photo-preview {
       position: absolute;
@@ -27,6 +35,8 @@ template.innerHTML = `
       max-width: 150px;
       opacity: 0;
     }
+    
+    
     
     @media only screen and (max-device-width: 480px) {
       #next-photo-preview {

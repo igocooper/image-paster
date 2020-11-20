@@ -24,6 +24,7 @@ class ImagePaster extends HTMLElement {
   }
 
   connectedCallback() {
+    this.loopEnabled = this.dataset.loop !== "false";
     this.setCanvasSize();
     this.init();
   }
@@ -83,7 +84,17 @@ class ImagePaster extends HTMLElement {
   handleMouseClick(event) {
     const { x, y } = getClickWithinElement(event);
 
+    if (!this.images.length && !this.loopEnabled) {
+      this.clearCanvas();
+      this.reInitImages();
+      this.updatePreview();
+      return;
+    }
+
     this.addImage(this.getImage(), x, y);
+    if (!this.images.length && this.loopEnabled) {
+      this.reInitImages();
+    }
     this.updatePreview();
   }
 
@@ -179,7 +190,7 @@ class ImagePaster extends HTMLElement {
   }
 
   hideGallery() {
-    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none;';
+    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none; margin:0; padding:0;';
   }
 
   reInitImages() {
@@ -187,15 +198,19 @@ class ImagePaster extends HTMLElement {
   }
 
   updatePreview() {
-    if (!this.images.length) {
-      this.reInitImages();
-    }
     const nextImage = this.images[0];
-    this.preview.setAttribute('src', nextImage.src);
+    const imgSrc = nextImage && nextImage.src;
+    if (!imgSrc) {
+      this.preview.classList.add('hidden');
+      return;
+    }
+    this.preview.classList.remove('hidden');
+    this.preview.setAttribute('src', imgSrc );
   }
 
   getImage() {
-    return this.images.shift().element;
+    const nextImage = this.images.shift().element;
+    return nextImage;
   }
 }
 

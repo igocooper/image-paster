@@ -191,7 +191,7 @@ Object.defineProperty(exports, "__esModule", {
 const isInsideEditor = () => {
   if (window.location !== window.parent.location) {
     const parentDocument = window.parent.document.documentElement;
-    return parentDocument.includes('admin-wrapper');
+    return parentDocument.className.includes('admin-wrapper');
   } else {
     return false;
   }
@@ -344,6 +344,7 @@ class ImagePaster extends HTMLElement {
   }
 
   connectedCallback() {
+    this.loopEnabled = this.dataset.loop !== "false";
     this.setCanvasSize();
     this.init();
   }
@@ -412,7 +413,17 @@ class ImagePaster extends HTMLElement {
           y = _getClickWithinElemen2.y;
 
 
+    if (!this.images.length && !this.loopEnabled) {
+      this.clearCanvas();
+      this.reInitImages();
+      this.updatePreview();
+      return;
+    }
+
     this.addImage(this.getImage(), x, y);
+    if (!this.images.length && this.loopEnabled) {
+      this.reInitImages();
+    }
     this.updatePreview();
   }
 
@@ -511,7 +522,7 @@ class ImagePaster extends HTMLElement {
   }
 
   hideGallery() {
-    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none;';
+    this.gallery.style = 'height: 0; opacity: 0; pointer-events: none; margin:0; padding:0;';
   }
 
   reInitImages() {
@@ -519,15 +530,19 @@ class ImagePaster extends HTMLElement {
   }
 
   updatePreview() {
-    if (!this.images.length) {
-      this.reInitImages();
-    }
     const nextImage = this.images[0];
-    this.preview.setAttribute('src', nextImage.src);
+    const imgSrc = nextImage && nextImage.src;
+    if (!imgSrc) {
+      this.preview.classList.add('hidden');
+      return;
+    }
+    this.preview.classList.remove('hidden');
+    this.preview.setAttribute('src', imgSrc);
   }
 
   getImage() {
-    return this.images.shift().element;
+    const nextImage = this.images.shift().element;
+    return nextImage;
   }
 }
 
@@ -581,6 +596,14 @@ template.innerHTML = `
     :host(:hover) #next-photo-preview {
         opacity: 1;
     }
+    
+    :host(:hover) #next-photo-preview.hidden {
+      opacity: 0;
+    }
+    
+    #canvas {
+      cursor: pointer;
+    }
 
     #next-photo-preview {
       position: absolute;
@@ -591,6 +614,8 @@ template.innerHTML = `
       max-width: 150px;
       opacity: 0;
     }
+    
+    
     
     @media only screen and (max-device-width: 480px) {
       #next-photo-preview {
