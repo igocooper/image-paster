@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.1
+
+* fix bug with initialization when there is no gallery
+
 ## 1.2.0
 
 * calculating images based on gallery meta instead of parsing it

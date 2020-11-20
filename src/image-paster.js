@@ -102,7 +102,7 @@ class ImagePaster extends HTMLElement {
     // timeout to not abuse call stack limit
     await wait(100);
 
-    const isGalleryInitialized = this.gallery.className.includes('initialized');
+    const isGalleryInitialized = this.gallery && this.gallery.className.includes('initialized');
 
     if (isGalleryInitialized) {
       if (!isInsideEditor()) {
