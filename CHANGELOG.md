@@ -1,9 +1,13 @@
 # CHANGELOG
 
-## 1.1.6
+## 1.2.0
 
 * calculating images based on gallery meta instead of parsing it
 * add control of looping via `data-loop` attribute
+
+## 1.1.6
+
+* fix bug with is-inside-editor
 
 ## 1.1.5
 
