@@ -12,6 +12,13 @@ Pasted images would be of the same size as they are styles within gallery node.
 
 `data-loop` - if explicitly set to `false` would clear canvas on user click when no images left, and only then re-initialize images.
 
+
+### CSS hooks
+`--mobile-tap-hint-width` - allows you to set width of mobile hint to ket user know that he can tap the screen
+`--mobile-tap-hand-fill` - allows you to set fill color for mobile tap hint hand
+`--mobile-tap-hand-stroke` - allows you to set stroke color for mobile tap hint hand
+`--mobile-tap-stroke` - allows you to set stroke color for mobile tap bubble press effect
+
 ### EXAMPLE OF USAGE
 
 ```html

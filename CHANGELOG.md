@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## ## 1.3.2
+## ## 1.4.0
+
+* add css hooks to style mobile tab hint
+
+## ## 1.3.3
 
 * fix css styles
 

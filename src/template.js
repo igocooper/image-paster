@@ -41,8 +41,9 @@ template.innerHTML = `
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 50%;
+      width: var(--mobile-tap-hint-width, 50%);
       transform: translate(-50%, -50%);
+      pointer-events: none;
       display: none;
     }
     
@@ -52,8 +53,8 @@ template.innerHTML = `
     }
     
     .hand-tap {
-      fill: #fff;
-      stroke: #000;
+      fill: var(--mobile-tap-hand-fill, #fff)
+      stroke: var(--mobile-tap-hand-stroke, #000);
       stroke-width: 3px;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -61,7 +62,7 @@ template.innerHTML = `
   
     .tap-1 {
       fill: transparent;
-      stroke: #000;
+      stroke: var(--mobile-tap-stroke, #000);
       stroke-width: 3px;
       stroke-linecap: round;
       stroke-linejoin: round;
