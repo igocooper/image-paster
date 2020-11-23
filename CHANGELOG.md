@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ## 1.4.1
+
+* fix bug with poorly written styles
+
 ## ## 1.4.0
 
 * add css hooks to style mobile tab hint

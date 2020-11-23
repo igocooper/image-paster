@@ -668,7 +668,7 @@ template.innerHTML = `
     }
     
     .hand-tap {
-      fill: var(--mobile-tap-hand-fill, #fff)
+      fill: var(--mobile-tap-hand-fill, #fff);
       stroke: var(--mobile-tap-hand-stroke, #000);
       stroke-width: 3px;
       stroke-linecap: round;
