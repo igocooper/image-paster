@@ -656,7 +656,7 @@ template.innerHTML = `
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 200px;
+      width: 50%;
       transform: translate(-50%, -50%);
       display: none;
     }
@@ -712,34 +712,32 @@ template.innerHTML = `
       }
     }
      
-    :host(.touch) {
-      #next-photo-preview {
+    :host(.touch) #next-photo-preview {
         visibility: hidden;
       }
       
-      .mobile-tap-hint {
-        display: block;
-      }
-      
-      .hand-tap {
-        animation: tap 1.25s ease-out backwards;
-        animation-iteration-count:infinite;
-      }
-      
-      .tap-1 {
-        animation: tap-circle 1.25s ease-out backwards;
-        animation-iteration-count:infinite;
-      }
-      
-      .mobile-tap-hint.hidden {
-        display: none;
-        animation: none;
-      }
-      
-      .mobile-tap-hint.hidden .hand-tap,
-      .mobile-tap-hint.hidden .tap-1 {
-        animation: none;
-      }
+    :host(.touch) .mobile-tap-hint {
+      display: block;
+    }
+    
+    :host(.touch) .hand-tap {
+      animation: tap 1.25s ease-out backwards;
+      animation-iteration-count:infinite;
+    }
+    
+    :host(.touch) .tap-1 {
+      animation: tap-circle 1.25s ease-out backwards;
+      animation-iteration-count:infinite;
+    }
+    
+    :host(.touch) .mobile-tap-hint.hidden {
+      display: none;
+      animation: none;
+    }
+    
+    :host(.touch) .mobile-tap-hint.hidden .hand-tap,
+    :host(.touch) .mobile-tap-hint.hidden .tap-1 {
+      animation: none;
     }
   </style>
   <img id="next-photo-preview" />

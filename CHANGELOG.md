@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ## 1.3.2
+
+* fix css styles
+
 ## ## 1.3.1
 
 * fix touch device detection viw JS
