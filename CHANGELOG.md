@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ## 1.3.1
+
+* fix touch device detection viw JS
+
 ## ## 1.3.0 
 
 * add mobile tap hint 

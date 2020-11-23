@@ -201,6 +201,25 @@ exports.default = isInsideEditor;
 
 /***/ }),
 
+/***/ "./helpers/is-touch-devices.js":
+/*!*************************************!*\
+  !*** ./helpers/is-touch-devices.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const isTouchDevice = () => 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
+
+exports.default = isTouchDevice;
+
+/***/ }),
+
 /***/ "./helpers/preload-image.js":
 /*!**********************************!*\
   !*** ./helpers/preload-image.js ***!
@@ -312,6 +331,10 @@ var _isInsideEditor = __webpack_require__(/*! ./helpers/is-inside-editor */ "./h
 
 var _isInsideEditor2 = _interopRequireDefault(_isInsideEditor);
 
+var _isTouchDevices = __webpack_require__(/*! ./helpers/is-touch-devices */ "./helpers/is-touch-devices.js");
+
+var _isTouchDevices2 = _interopRequireDefault(_isTouchDevices);
+
 var _getSameRatioHeightFromWidth = __webpack_require__(/*! ./helpers/get-same-ratio-height-from-width */ "./helpers/get-same-ratio-height-from-width.js");
 
 var _getSameRatioHeightFromWidth2 = _interopRequireDefault(_getSameRatioHeightFromWidth);
@@ -345,6 +368,9 @@ class ImagePaster extends HTMLElement {
 
   connectedCallback() {
     this.loopEnabled = this.dataset.loop !== "false";
+    if ((0, _isTouchDevices2.default)()) {
+      this.classList.add('touch');
+    }
     this.setCanvasSize();
     this.init();
   }
@@ -686,10 +712,7 @@ template.innerHTML = `
       }
     }
      
-    @media (min-width: 768px) and (max-width: 1024px),
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape),
-    @media (min-width: 481px) and (max-width: 767px),
-    @media (min-width: 320px) and (max-width: 480px) {
+    :host(.touch) {
       #next-photo-preview {
         visibility: hidden;
       }
