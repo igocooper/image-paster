@@ -338,6 +338,7 @@ class ImagePaster extends HTMLElement {
     this.canvas = this.shadow.querySelector('#canvas');
     this.context = this.canvas.getContext('2d');
     this.preview = this.shadow.querySelector('#next-photo-preview');
+    this.mobileHint = this.shadow.querySelector('.mobile-tap-hint');
 
     this.bindMethods();
   }
@@ -362,6 +363,7 @@ class ImagePaster extends HTMLElement {
     this.reInitImages = this.reInitImages.bind(this);
     this.prepareImagesData = this.prepareImagesData.bind(this);
     this.hideGallery = this.hideGallery.bind(this);
+    this.hideMobileHint = this.hideMobileHint.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -406,6 +408,8 @@ class ImagePaster extends HTMLElement {
   }
 
   handleMouseClick(event) {
+    this.hideMobileHint();
+
     var _getClickWithinElemen2 = (0, _getClickWithinElement2.default)(event);
 
     const x = _getClickWithinElemen2.x,
@@ -424,6 +428,12 @@ class ImagePaster extends HTMLElement {
       this.reInitImages();
     }
     this.updatePreview();
+  }
+
+  hideMobileHint() {
+    if (!this.mobileHint.classList.contains('hidden')) {
+      this.mobileHint.classList.add('hidden');
+    }
   }
 
   init() {
@@ -616,14 +626,104 @@ template.innerHTML = `
     }
     
     
+   .mobile-tap-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
     
-    @media only screen and (max-device-width: 480px) {
+    .mobile-tap-hint * {
+      transform-origin: 50% 50%;
+      perspective: 100px;
+    }
+    
+    .hand-tap {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 3px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  
+    .tap-1 {
+      fill: transparent;
+      stroke: #000;
+      stroke-width: 3px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: .5;
+    }
+    
+    
+  
+    @keyframes tap {
+      0% {
+        transform: rotateX(0deg);
+      }
+      10% {
+        transform: rotateX(12.5deg);
+      }
+      25% {
+        transform: rotateX(25deg);
+      }
+    }
+    
+    @keyframes tap-circle {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      75% {
+        transform: scale(1.05);
+        opacity: .6;
+      }
+      80% {
+        transform: scale(1);
+        opacity: .5;
+      }
+    }
+     
+    @media (min-width: 768px) and (max-width: 1024px),
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape),
+    @media (min-width: 481px) and (max-width: 767px),
+    @media (min-width: 320px) and (max-width: 480px) {
       #next-photo-preview {
         visibility: hidden;
+      }
+      
+      .mobile-tap-hint {
+        display: block;
+      }
+      
+      .hand-tap {
+        animation: tap 1.25s ease-out backwards;
+        animation-iteration-count:infinite;
+      }
+      
+      .tap-1 {
+        animation: tap-circle 1.25s ease-out backwards;
+        animation-iteration-count:infinite;
+      }
+      
+      .mobile-tap-hint.hidden {
+        display: none;
+        animation: none;
+      }
+      
+      .mobile-tap-hint.hidden .hand-tap,
+      .mobile-tap-hint.hidden .tap-1 {
+        animation: none;
       }
     }
   </style>
   <img id="next-photo-preview" />
+  <svg class="mobile-tap-hint" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <circle class="tap-1" cx="89.43" cy="64.48" r="19.46"/>
+    <path class="hand-tap" d="M139.93,102.68,98.81,95.75V65.2A9.25,9.25,0,0,0,89.56,56h0a9.25,9.25,0,0,0-9.25,9.25v57.36L71,111.77c-3.61-3.61-8.44-3.89-13.08,0,0,0-7.24,5.84-3.83,9.25l34,34h42.63a9.25,9.25,0,0,0,9.07-7.43l6.82-34.09A9.28,9.28,0,0,0,139.93,102.68Z"/>
+  </svg>
   <canvas id="canvas"></canvas>
 `;
 

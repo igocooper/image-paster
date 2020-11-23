@@ -18,6 +18,7 @@ class ImagePaster extends HTMLElement {
     this.canvas = this.shadow.querySelector('#canvas');
     this.context = this.canvas.getContext('2d');
     this.preview = this.shadow.querySelector('#next-photo-preview');
+    this.mobileHint = this.shadow.querySelector('.mobile-tap-hint');
 
     this.bindMethods();
   }
@@ -42,6 +43,7 @@ class ImagePaster extends HTMLElement {
     this.reInitImages = this.reInitImages.bind(this);
     this.prepareImagesData = this.prepareImagesData.bind(this);
     this.hideGallery = this.hideGallery.bind(this);
+    this.hideMobileHint = this.hideMobileHint.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -81,6 +83,7 @@ class ImagePaster extends HTMLElement {
   }
 
   handleMouseClick(event) {
+    this.hideMobileHint();
     const { x, y } = getClickWithinElement(event);
 
     if (!this.images.length && !this.loopEnabled) {
@@ -95,6 +98,12 @@ class ImagePaster extends HTMLElement {
       this.reInitImages();
     }
     this.updatePreview();
+  }
+
+  hideMobileHint() {
+    if (!this.mobileHint.classList.contains('hidden')) {
+      this.mobileHint.classList.add('hidden');
+    }
   }
 
   async init() {

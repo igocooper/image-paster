@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ## 1.3.0 
+
+* add mobile tap hint 
+
 ## 1.2.2
 
 * fix bug with gallery detection
