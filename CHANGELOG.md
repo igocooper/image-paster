@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.1
+
+* fix bug with calculation of maxX and maxY position
+
 ## 1.5.0
 
 * add `data-crop` attribute to configure cropping images near canvas edges

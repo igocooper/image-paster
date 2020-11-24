@@ -426,8 +426,8 @@ class ImagePaster extends HTMLElement {
       };
     }
 
-    const x = Math.min(canvasWidth, Math.max(imgX, 0));
-    const y = Math.min(canvasHeight, Math.max(imgY, 0));
+    const x = Math.min(canvasWidth - imgWidth, Math.max(imgX, 0));
+    const y = Math.min(canvasHeight - imgHeight, Math.max(imgY, 0));
     return {
       x,
       y
