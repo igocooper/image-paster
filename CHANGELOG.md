@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## ## 1.4.1
+## 1.5.0
+
+* add `data-crop` attribute to configure cropping images near canvas edges
+
+## 1.4.1
 
 * fix bug with poorly written styles
 
@@ -14,7 +18,7 @@
 
 ## ## 1.3.1
 
-* fix touch device detection viw JS
+* fix touch device detection via JS
 
 ## ## 1.3.0 
 

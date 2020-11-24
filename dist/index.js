@@ -367,7 +367,8 @@ class ImagePaster extends HTMLElement {
   }
 
   connectedCallback() {
-    this.loopEnabled = this.dataset.loop !== "false";
+    this.loopEnabled = this.dataset.loop !== 'false';
+    this.cropEnabled = this.dataset.crop !== 'false';
     if ((0, _isTouchDevices2.default)()) {
       this.classList.add('touch');
     }
@@ -390,6 +391,7 @@ class ImagePaster extends HTMLElement {
     this.prepareImagesData = this.prepareImagesData.bind(this);
     this.hideGallery = this.hideGallery.bind(this);
     this.hideMobileHint = this.hideMobileHint.bind(this);
+    this.calculateImagePosition = this.calculateImagePosition.bind(this);
     this.init = this.init.bind(this);
   }
 
@@ -412,13 +414,37 @@ class ImagePaster extends HTMLElement {
     this.context.fillRect(x, y, w, h);
   }
 
-  addImage(img, x, y) {
+  calculateImagePosition({ imgWidth, imgHeight, clientX, clientY }) {
+    const canvasWidth = this.canvas.width;
+    const canvasHeight = this.canvas.height;
+    const imgX = clientX - imgWidth / 2;
+    const imgY = clientY - imgHeight / 2;
+    if (this.cropEnabled) {
+      return {
+        x: imgX,
+        y: imgY
+      };
+    }
+
+    const x = Math.min(canvasWidth, Math.max(imgX, 0));
+    const y = Math.min(canvasHeight, Math.max(imgY, 0));
+    return {
+      x,
+      y
+    };
+  }
+
+  addImage(img, clientX, clientY) {
     const imgWidth = img.width;
     const imgHeight = img.height;
-    const imgX = x - imgWidth / 2;
-    const imgY = y - imgHeight / 2;
 
-    this.context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+    var _calculateImagePositi = this.calculateImagePosition({ imgWidth, imgHeight, clientX, clientY });
+
+    const x = _calculateImagePositi.x,
+          y = _calculateImagePositi.y;
+
+
+    this.context.drawImage(img, x, y, imgWidth, imgHeight);
   }
 
   handleMouseMove(event) {
