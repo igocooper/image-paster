@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.5
+
+* fix binding of new methods
+
 ## 1.5.4
 
 * fix obsolete mediaQuery.addListener()
