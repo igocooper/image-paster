@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.2 
+
+* fix bug with device orientation change
+
 ## 1.5.1
 
 * fix bug with calculation of maxX and maxY position

@@ -29,10 +29,10 @@ You can set value for this CSS variables in order to style shadow dom elements i
 ### EXAMPLE OF USAGE
 
 ```html
-<div class="gallery" data-loop="true" data-crop="true">
+<div class="gallery">
   <img src="./images/image-1" />
   <img src="./images/image-2" />
   <img src="./images/image-3" />
 </div>
-<image-paster />
+<image-paster data-loop="true" data-crop="true" />
 ```
