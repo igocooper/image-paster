@@ -15,11 +15,13 @@ class ImagePaster extends HTMLElement {
 
     this.shadow = this.attachShadow({ mode: 'open' }); // sets and returns 'this.shadowRoot'
     // attach the created elements to the shadow DOM
-    this.shadow.append(document.importNode(template.content, true));
-    this.canvas = this.shadow.querySelector('#canvas');
-    this.context = this.canvas.getContext('2d');
-    this.preview = this.shadow.querySelector('#next-photo-preview');
-    this.mobileHint = this.shadow.querySelector('.mobile-tap-hint');
+    if (!isInsideEditor()) {
+      this.shadow.append(document.importNode(template.content, true));
+      this.canvas = this.shadow.querySelector('#canvas');
+      this.context = this.canvas.getContext('2d');
+      this.preview = this.shadow.querySelector('#next-photo-preview');
+      this.mobileHint = this.shadow.querySelector('.mobile-tap-hint');
+    }
 
     this.bindMethods();
   }
@@ -30,13 +32,19 @@ class ImagePaster extends HTMLElement {
     if (isTouchDevice()) {
       this.classList.add('touch');
     }
-    this.setCanvasSize();
-    this.init();
+
+    if (!isInsideEditor()) {
+      this.setCanvasSize();
+      this.init();
+    }
   }
 
   disconnectedCallback() {
-    this.canvas.removeEventListener('mousedown', this.handleMouseClick);
-    this.canvas.removeEventListener('mousemove', this.handleMouseMove);
+    if (!isInsideEditor()) {
+      this.canvas.removeEventListener('mousedown', this.handleMouseClick);
+      this.canvas.removeEventListener('mousemove', this.handleMouseMove);
+      this.orientation.removeEventListener('change', this.handleOrientationChange);
+    }
   }
 
   bindMethods() {
@@ -62,11 +70,6 @@ class ImagePaster extends HTMLElement {
 
   clearCanvas() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  addRedRectagle(x, y, w = 10, h = 10) {
-    this.context.fillStyle = 'red';
-    this.context.fillRect(x, y, w, h);
   }
 
   calculateImagePosition({ imgWidth, imgHeight, clientX, clientY }) {
@@ -128,11 +131,6 @@ class ImagePaster extends HTMLElement {
 
   handleOrientationChange(e) {
     // we don't care about orientation but just in case we can use those
-    // if (e.matches) {
-    //   // portrait
-    // } else {
-    //   // landscape
-    // }
     this.clearCanvas()
     this.setCanvasSize()
   }
@@ -144,9 +142,6 @@ class ImagePaster extends HTMLElement {
   }
 
   async init() {
-    if (isInsideEditor()) {
-      return;
-    }
     // timeout to not abuse call stack limit
     await wait(100);
 

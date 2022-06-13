@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.8
+
+* stop render component inside editor
+
 ## 1.5.7
 
 * do not initialize inside editor
