@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.9
+
+* fix pointer events
+
 ## 1.5.8
 
 * stop render component inside editor

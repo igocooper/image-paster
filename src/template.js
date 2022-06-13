@@ -1,7 +1,7 @@
 const template = document.createElement("template");
 
 template.innerHTML = `
-<style>  
+<style>
     html, body {
       margin: 0;
       padding: 0;
@@ -12,16 +12,21 @@ template.innerHTML = `
       display: block;
       width: 100vw;
       height: 100vh;
+      pointer-events: none;
+    }
+
+    :host > * {
+      pointer-events: auto;
     }
 
     :host(:hover) #next-photo-preview {
         opacity: 1;
     }
-    
+
     :host(:hover) #next-photo-preview.hidden {
       opacity: 0;
     }
-    
+
     #canvas {
       cursor: pointer;
     }
@@ -35,8 +40,8 @@ template.innerHTML = `
       max-width: 150px;
       opacity: 0;
     }
-    
-    
+
+
    .mobile-tap-hint {
       position: absolute;
       top: 50%;
@@ -46,12 +51,12 @@ template.innerHTML = `
       pointer-events: none;
       display: none;
     }
-    
+
     .mobile-tap-hint * {
       transform-origin: 50% 50%;
       perspective: 100px;
     }
-    
+
     .hand-tap {
       fill: var(--mobile-tap-hand-fill, #fff);
       stroke: var(--mobile-tap-hand-stroke, #000);
@@ -59,7 +64,7 @@ template.innerHTML = `
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-  
+
     .tap-1 {
       fill: transparent;
       stroke: var(--mobile-tap-stroke, #000);
@@ -68,9 +73,9 @@ template.innerHTML = `
       stroke-linejoin: round;
       opacity: .5;
     }
-    
-    
-  
+
+
+
     @keyframes tap {
       0% {
         transform: rotateX(0deg);
@@ -82,7 +87,7 @@ template.innerHTML = `
         transform: rotateX(25deg);
       }
     }
-    
+
     @keyframes tap-circle {
       0% {
         transform: scale(0);
@@ -97,30 +102,30 @@ template.innerHTML = `
         opacity: .5;
       }
     }
-     
+
     :host(.touch) #next-photo-preview {
         visibility: hidden;
       }
-      
+
     :host(.touch) .mobile-tap-hint {
       display: block;
     }
-    
+
     :host(.touch) .hand-tap {
       animation: tap 1.25s ease-out backwards;
       animation-iteration-count:infinite;
     }
-    
+
     :host(.touch) .tap-1 {
       animation: tap-circle 1.25s ease-out backwards;
       animation-iteration-count:infinite;
     }
-    
+
     :host(.touch) .mobile-tap-hint.hidden {
       display: none;
       animation: none;
     }
-    
+
     :host(.touch) .mobile-tap-hint.hidden .hand-tap,
     :host(.touch) .mobile-tap-hint.hidden .tap-1 {
       animation: none;
