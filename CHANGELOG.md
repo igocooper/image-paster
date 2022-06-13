@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.3
+
+* fix build version after 1.5.2
+
 ## 1.5.2 
 
 * fix bug with device orientation change

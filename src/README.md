@@ -36,3 +36,16 @@ You can set value for this CSS variables in order to style shadow dom elements i
 </div>
 <image-paster data-loop="true" data-crop="true" />
 ```
+
+
+### DEV NOTES
+
+**NOTE:** We use jsdeliver cdn to host versions in order to create new version you should:
+1. update source code
+2. update change log and describe your changes
+3. run build `npm run build`
+4. commit your changes `git commit`
+5. push your changes `git push`
+6. create version tag `git tag -a <tag_name> -m "<tag_message>"`
+7. push tags `git push --tags`
+8. you can now access your new version via link `https://cdn.jsdelivr.net/gh/igocooper/image-paster@<VERSION_TAG>/dist/index.js`

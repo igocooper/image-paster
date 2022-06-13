@@ -482,6 +482,17 @@ class ImagePaster extends HTMLElement {
     this.updatePreview();
   }
 
+  handleOrientationChange(e) {
+    // we don't care about orientation but just in case we can use those
+    // if (e.matches) {
+    //   // portrait
+    // } else {
+    //   // landscape
+    // }
+    this.clearCanvas();
+    this.setCanvasSize();
+  }
+
   hideMobileHint() {
     if (!this.mobileHint.classList.contains('hidden')) {
       this.mobileHint.classList.add('hidden');
@@ -511,6 +522,8 @@ class ImagePaster extends HTMLElement {
         // add event listeners to canvas
         _this.canvas.addEventListener('mousedown', _this.handleMouseClick);
         _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
+        _this.orientation = window.matchMedia('(orientation: portrait)');
+        _this.orientation.addListener(_this.handleOrientationChange);
         return;
       }
       // Recursively wait till gallery is initialized
