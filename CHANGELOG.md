@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.6
+
+* fix binding of new methods
+
 ## 1.5.5
 
 * fix binding of new methods

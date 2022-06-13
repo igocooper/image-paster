@@ -392,6 +392,7 @@ class ImagePaster extends HTMLElement {
     this.hideGallery = this.hideGallery.bind(this);
     this.hideMobileHint = this.hideMobileHint.bind(this);
     this.calculateImagePosition = this.calculateImagePosition.bind(this);
+    this.handleOrientationChange = this.handleOrientationChange.bind(this);
     this.init = this.init.bind(this);
   }
 
