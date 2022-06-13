@@ -523,7 +523,7 @@ class ImagePaster extends HTMLElement {
         _this.canvas.addEventListener('mousedown', _this.handleMouseClick);
         _this.canvas.addEventListener('mousemove', _this.handleMouseMove);
         _this.orientation = window.matchMedia('(orientation: portrait)');
-        _this.orientation.addListener(_this.handleOrientationChange);
+        _this.orientation.addEventListener('change', _this.handleOrientationChange);
         return;
       }
       // Recursively wait till gallery is initialized

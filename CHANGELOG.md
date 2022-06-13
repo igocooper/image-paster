@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.4
+
+* fix obsolete mediaQuery.addListener()
+
 ## 1.5.3
 
 * fix build version after 1.5.2
