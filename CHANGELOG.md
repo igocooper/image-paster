@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.7
+
+* do not initialize inside editor
+
 ## 1.5.6
 
 * fix binding of new methods

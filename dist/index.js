@@ -504,6 +504,9 @@ class ImagePaster extends HTMLElement {
     var _this = this;
 
     return _asyncToGenerator(function* () {
+      if ((0, _isInsideEditor2.default)()) {
+        return;
+      }
       // timeout to not abuse call stack limit
       yield (0, _wait2.default)(100);
 

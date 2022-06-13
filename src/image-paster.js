@@ -144,6 +144,9 @@ class ImagePaster extends HTMLElement {
   }
 
   async init() {
+    if (isInsideEditor()) {
+      return;
+    }
     // timeout to not abuse call stack limit
     await wait(100);
 
